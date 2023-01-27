@@ -10,30 +10,24 @@ import 'package:dynamic_bottom_sheet/src/snapping_position.dart';
 import 'package:dynamic_bottom_sheet/src/snapping_sheet_content.dart';
 
 class DynamicSheet extends StatefulWidget {
-  final double maxSheetHeight;
+  final double sheetFactor;
 
   // final SnappingSheetContent? sheetAbove;
-  final SheetContent content;
   // final Widget grabbing;
   // final double grabbingHeight;
+  final SheetContent content;
   final Widget? child;
   final bool lockOverflowDrag;
   final SnappingPosition? initialSnappingPosition;
   final SnappingSheetController? controller;
   final Function(SheetPositionData positionData)? onSheetMoved;
-  final Function(
-    SheetPositionData positionData,
-    SnappingPosition snappingPosition,
-  )? onSnapCompleted;
-  final Function(
-    SheetPositionData positionData,
-    SnappingPosition snappingPosition,
-  )? onSnapStart;
+  final Function(SheetPositionData positionData, SnappingPosition snappingPosition,)? onSnapCompleted;
+  final Function(SheetPositionData positionData, SnappingPosition snappingPosition,)? onSnapStart;
   final Axis axis;
 
   const DynamicSheet({
     Key? key,
-    required this.maxSheetHeight,
+    required this.sheetFactor,
     // this.sheetAbove,
     required this.content,
     // this.grabbing = const SizedBox(),
@@ -45,12 +39,13 @@ class DynamicSheet extends StatefulWidget {
     this.onSheetMoved,
     this.onSnapCompleted,
     this.onSnapStart,
-  })  : axis = Axis.vertical,
+  })  : assert(sheetFactor >= 0 && sheetFactor <= 1, 'Sheet factor must be between 0 and 1'),
+        axis = Axis.vertical,
         super(key: key);
 
   const DynamicSheet.horizontal({
     Key? key,
-    required this.maxSheetHeight,
+    required this.sheetFactor,
     // SnappingSheetContent? sheetRight,
     required SheetContent sheetLeft,
     // this.grabbing = const SizedBox(),
@@ -62,7 +57,8 @@ class DynamicSheet extends StatefulWidget {
     this.onSheetMoved,
     this.onSnapCompleted,
     this.onSnapStart,
-  })  : content = sheetLeft,
+  })  : assert(sheetFactor >= 0 && sheetFactor <= 1, 'Sheet factor must be between 0 and 1'),
+        content = sheetLeft,
         // sheetAbove = sheetRight,
         axis = Axis.horizontal,
         // grabbingHeight = grabbingWidth,
@@ -93,13 +89,24 @@ class _DynamicSheetState extends State<DynamicSheet> with TickerProviderStateMix
       for (int i = 0; i < widget.content.childCount; i++) {
         final size = MeasureUtil.measureWidget(
             MeasureUtil.wrap(widget.content.childAt(i)));
-        sizesBeforeRender[i] = size.height > widget.maxSheetHeight
-            ? widget.maxSheetHeight
+        sizesBeforeRender[i] = size.height > maxSheetSize
+            ? maxSheetSize
             : size.height;
       }
     } catch(e){}
     return sizesBeforeRender;
   }
+
+  double get screenSize {
+    return widget.axis == Axis.horizontal
+        ? _latestConstraints!.maxWidth
+        : _latestConstraints!.maxHeight;
+  }
+
+  double get maxSheetSize {
+    final maxSize = screenSize * widget.sheetFactor;
+    return maxSize;
+}
 
   void updateMaxSnap({bool snapAfterUpdate = true}) {
     final height = _childrenSizes[currentPageIndex];
@@ -127,10 +134,10 @@ class _DynamicSheetState extends State<DynamicSheet> with TickerProviderStateMix
 
   void updateChildSizeAt({required int index, required double height, bool snapAfterUpdate = true}) {
     if (_childrenSizes[index] != height) {
-      if (height >= widget.maxSheetHeight) {
-        if (_childrenSizes[index] != widget.maxSheetHeight) {
+      if (height >= maxSheetSize) {
+        if (_childrenSizes[index] != maxSheetSize) {
           setState(() {
-            _childrenSizes[index] = widget.maxSheetHeight;
+            _childrenSizes[index] = maxSheetSize;
           });
         }
       } else {
@@ -197,7 +204,7 @@ class _DynamicSheetState extends State<DynamicSheet> with TickerProviderStateMix
     Future.delayed(const Duration(seconds: 0)).then((value) {
       setState(() {
         _currentPosition = _initSnappingPosition.getPositionInPixels(
-          sheetSize,
+          screenSize,
           grabbingHeight,
         );
       });
@@ -285,7 +292,7 @@ class _DynamicSheetState extends State<DynamicSheet> with TickerProviderStateMix
   TickerFuture _animateToPosition(SnappingPosition snappingPosition) {
     _animationController.duration = snappingPosition.snappingDuration;
     var endPosition = snappingPosition.getPositionInPixels(
-      sheetSize,
+      screenSize,
       grabbingHeight,
     );
     _snappingAnimation = Tween(
@@ -305,15 +312,9 @@ class _DynamicSheetState extends State<DynamicSheet> with TickerProviderStateMix
     return SnappingCalculator(
         allSnappingPositions: _snappingPositions,
         lastSnappingPosition: _lastSnappingPosition,
-        maxHeight: sheetSize,
+        maxHeight: screenSize,
         grabbingHeight: grabbingHeight,
         currentPosition: _currentPosition);
-  }
-
-  double get sheetSize {
-    return widget.axis == Axis.horizontal
-        ? _latestConstraints!.maxWidth
-        : _latestConstraints!.maxHeight;
   }
 
   Widget buildGrabbingWidget() {
@@ -347,7 +348,7 @@ class _DynamicSheetState extends State<DynamicSheet> with TickerProviderStateMix
       axis: widget.axis,
       content: widget.content,
       currentPosition: _currentPosition,
-      maxHeight: sheetSize,
+      maxHeight: screenSize,
       grabbingHeight: grabbingHeight,
     );
   }
@@ -365,9 +366,9 @@ class _DynamicSheetState extends State<DynamicSheet> with TickerProviderStateMix
 
             Positioned(
               left: 0,
-              right: widget.axis == Axis.horizontal ? sheetSize - _currentPosition : 0,
+              right: widget.axis == Axis.horizontal ? screenSize - _currentPosition : 0,
               bottom: 0,
-              top: widget.axis == Axis.horizontal ? 0 : sheetSize - _currentPosition,
+              top: widget.axis == Axis.horizontal ? 0 : screenSize - _currentPosition,
               child: ColoredBox(
                 color: Colors.white,
                 child: TweenAnimationBuilder<double>(
@@ -524,7 +525,7 @@ class _DynamicSheetState extends State<DynamicSheet> with TickerProviderStateMix
   void _setSheetPositionFactor(double factor) {
     _animationController.stop();
     setState(() {
-      _currentPosition = factor * sheetSize;
+      _currentPosition = factor * screenSize;
     });
   }
 }

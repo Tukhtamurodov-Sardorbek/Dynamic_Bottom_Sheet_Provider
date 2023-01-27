@@ -53,7 +53,7 @@ class _MyAppState extends State<MyApp> {
         ],
       ),
       body: DynamicSheet(
-        maxSheetHeight: 450.0,
+        sheetFactor: 0.6,
         lockOverflowDrag: true,
         content: SheetContent(
           isDraggable: true,
