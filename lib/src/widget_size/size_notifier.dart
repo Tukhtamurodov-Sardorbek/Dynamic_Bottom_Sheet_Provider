@@ -1,9 +1,9 @@
-import 'package:dynamic_bottom_sheet/src/on_drag_wrapper.dart';
+import 'package:dynamic_bottom_sheet/src/helpers/on_drag_wrapper.dart';
 import 'package:flutter/material.dart';
 
-import '../scroll_controller_override.dart';
-import '../snapping_calculator.dart';
-import '../snapping_sheet_content.dart';
+import '../helpers/scroll_controller_override.dart';
+import '../helpers/snapping_calculator.dart';
+import '../helpers/snapping_sheet_content.dart';
 
 class SizeNotifier extends StatefulWidget {
   final SheetContent content;
@@ -82,7 +82,7 @@ class _SizeNotifierState extends State<SizeNotifier> {
   }
 
   Widget draggableChild() {
-    return OnDragWrapper(
+    return DragWrapper(
       dragEnd: widget.dragEnd,
       dragUpdate: widget.dragUpdate,
       axis: widget.axis,

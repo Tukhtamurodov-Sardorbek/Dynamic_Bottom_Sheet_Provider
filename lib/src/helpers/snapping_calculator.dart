@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:dynamic_bottom_sheet/src/snapping_position.dart';
+import 'package:dynamic_bottom_sheet/src/helpers/snapping_position.dart';
 
 enum DragDirection {
   up,

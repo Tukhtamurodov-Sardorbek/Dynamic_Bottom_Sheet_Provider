@@ -1,4 +1,4 @@
-import 'package:dynamic_bottom_sheet/src/snapping_calculator.dart';
+import 'package:dynamic_bottom_sheet/src/helpers/snapping_calculator.dart';
 
 class SheetPositionData {
   final double _pixels;

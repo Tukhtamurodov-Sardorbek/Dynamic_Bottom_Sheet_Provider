@@ -1,30 +1,44 @@
-import 'package:dynamic_bottom_sheet/src/snapping_position.dart';
-import 'package:dynamic_bottom_sheet/src/snapping_sheet_content.dart';
-import 'package:dynamic_bottom_sheet/src/snapping_sheet_widget.dart';
+import 'package:dynamic_bottom_sheet/src/data/provider.dart';
+import 'package:dynamic_bottom_sheet/src/helpers/snapping_sheet_content.dart';
+import 'package:dynamic_bottom_sheet/src/dynamic_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(
-    MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Snapping Sheet Examples',
-      theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.grey[700],
-          elevation: 0,
-          foregroundColor: Colors.white,
-          titleTextStyle: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+    ScreenUtilInit(
+      designSize: const Size(360, 690),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child){
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Snapping Sheet Examples',
+          theme: ThemeData(
+            appBarTheme: AppBarTheme(
+              backgroundColor: Colors.grey[700],
+              elevation: 0,
+              foregroundColor: Colors.white,
+              titleTextStyle: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              iconTheme: const IconThemeData(color: Colors.white),
+            ),
+            primarySwatch: Colors.grey,
           ),
-          iconTheme: const IconThemeData(color: Colors.white),
-        ),
-        primarySwatch: Colors.grey,
+          home: child,
+        );
+      },
+      child: ChangeNotifierProvider(
+        create: (context) => SheetProvider(),
+        child: const MyApp(),
       ),
-      home: const MyApp(),
     ),
   );
 }
+
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -55,18 +69,21 @@ class _MyAppState extends State<MyApp> {
       body: DynamicSheet(
         sheetFactor: 0.6,
         lockOverflowDrag: true,
+        pageController: pageController,
         content: SheetContent(
-          isDraggable: true,
-          pageController: pageController,
+          // isDraggable: false,
           children: [
             SheetPage(isListView: true, child: Mwidget(15)),
             SheetPage(isListView: true, child: Mwidget(5)),
             SheetPage(isListView: false, child: Container(height: 200, color: Colors.black,)),
             SheetPage(isListView: true, child: Mwidget(145)),
-            // SheetPage(isListView: true, child: Mwidget(1455)),
+            SheetPage(isListView: false, child: Container(height: 400, color: Colors.greenAccent,)),
+            SheetPage(isListView: true, child: Mwidget(20)),
+            SheetPage(isListView: false, child: Container(height: 500, color: Colors.teal,)),
+            SheetPage(isListView: true, child: Mwidget(2)),
           ],
         ),
-        child: Container(
+        scaffoldBody: Container(
           width: MediaQuery.of(context).size.width,
           padding: const EdgeInsets.all(16),
           color: Colors.cyanAccent,

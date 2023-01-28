@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:dynamic_bottom_sheet/src/snapping_sheet_content.dart';
-import 'package:dynamic_bottom_sheet/src/snapping_calculator.dart';
+import 'package:dynamic_bottom_sheet/src/helpers/snapping_sheet_content.dart';
+import 'package:dynamic_bottom_sheet/src/helpers/snapping_calculator.dart';
 
 class ScrollControllerOverride extends StatefulWidget {
   final ScrollController scrollController;

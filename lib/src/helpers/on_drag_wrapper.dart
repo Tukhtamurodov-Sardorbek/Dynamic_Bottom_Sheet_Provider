@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class OnDragWrapper extends StatelessWidget {
+class DragWrapper extends StatelessWidget {
   final Widget child;
   final Function(double) dragUpdate;
   final VoidCallback dragEnd;
   final Axis axis;
 
-  const OnDragWrapper({
+  const DragWrapper({
     Key? key,
     required this.dragEnd,
     required this.child,
